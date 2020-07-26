@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-country',
@@ -7,7 +7,7 @@ import { ActivatedRoute, ActivatedRouteSnapshot } from '@angular/router';
   styleUrls: ['./country.component.css']
 })
 export class CountryComponent implements OnInit {
-  country: string;
+  country = 'Select a country';
 
   constructor(r: ActivatedRoute) {
     r.paramMap.subscribe(o => this.country = o.get('id'));

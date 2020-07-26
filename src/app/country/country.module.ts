@@ -6,13 +6,15 @@ import { CountryComponent } from './country.component';
 import { NeighboringCountryComponent } from './neighboring-country/neighboring-country.component';
 import { CityComponent } from './city/city.component';
 import { PlaceOfInterestComponent } from './place-of-interest/place-of-interest.component';
+import { CountriesRootComponentComponent } from './countries-root-component.component';
 
 @NgModule({
   declarations: [
     CountryComponent,
     NeighboringCountryComponent,
     CityComponent,
-    PlaceOfInterestComponent
+    PlaceOfInterestComponent,
+    CountriesRootComponentComponent
   ],
   imports: [
     CommonModule,

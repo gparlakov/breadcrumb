@@ -8,8 +8,7 @@ import { BreadcrumbService } from './breadcrumb.service';
 })
 export class BreadcrumbResolver implements Resolve<boolean> {
   constructor(private bs: BreadcrumbService) {
-    console.log(BreadcrumbService.name);
-   }
+  }
 
   resolve(
     route: ActivatedRouteSnapshot, state: RouterStateSnapshot

@@ -10,9 +10,10 @@ import { Observable } from 'rxjs';
 export class BreadcrumbComponent {
 
   state$: Observable<string>;
+  names$: Observable<string[]>;
 
   constructor(s: BreadcrumbService) {
     this.state$ = s.state$;
-    this.state$.subscribe(console.warn);
+    this.names$ = s.names$;
   }
 }

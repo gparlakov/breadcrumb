@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
-import { Observable, isObservable, BehaviorSubject } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { Injectable, Inject } from '@angular/core';
+import { Observable, isObservable, BehaviorSubject, of, forkJoin } from 'rxjs';
+import { take, defaultIfEmpty } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
@@ -10,37 +10,40 @@ export class BreadcrumbService {
   private state = new BehaviorSubject<string>('');
   public state$ = this.state.asObservable();
 
-  constructor(private resolvers: BreadcrumbNameResolverHolder) {
-    console.log(BreadcrumbNameResolverHolder.name);
+  private names = new BehaviorSubject<string[]>(['']);
+  public names$ = this.names.asObservable();
+
+  constructor() {
   }
   onRoute(id: string, url: string) {
-    console.log('---', id, url);
     const bc = tree[id];
-    let name = '...';
-    const res = this.resolvers.get().find(r => r.id === bc.id);
-    if (res == null) {
-      console.log('resolver not found - using the data name');
-      name = bc.name;
-    } else {
-      if (isObservable(res.name)) {
-        res.name.pipe(take(1)).subscribe(n => name = n);
-      } else {
-        name = res.name;
-      }
-    }
 
-    const v = this.state.value;
-    if (v.includes(bc.id)) {
-      // we are subtracting from the state
-      const i = v.indexOf(bc.id);
-      this.state.next(v.slice(0, i + bc.id.length));
-    } else {
-      const breadCrumbs = 'root' in bc && bc.root === true
-        ? bc.id
-        : getParents(bc);
+    const breadCrumbs = 'root' in bc && bc.root === true
+      ? bc.id
+      : buildBreadcrumbsFromTheBottomUp(bc, '/');
 
-      this.state.next(breadCrumbs);
-    }
+    this.state.next(breadCrumbs);
+
+    const nameResolvers = BreadcrumbNameResolverHolder.get();
+
+    forkJoin(
+      breadCrumbs
+        .split('/')
+        .map(i => {
+          const res = nameResolvers.find(r => r.id === i);
+          if (res == null) {
+            return of(bc.name);
+          } else {
+            if (typeof res.name === 'string') {
+              return of(res.name);
+            } else {
+              return res.name(id, url);
+            }
+          }
+        }))
+      .pipe(defaultIfEmpty([] as string[]), take(1))
+      .subscribe(n => this.names.next(n));
+
   }
 }
 
@@ -50,35 +53,34 @@ const tree: { [k: string]: Breadcrumb | null } = {
   city: { parent: 'country', id: 'city' }
 };
 
-function getParents(b: Breadcrumb) {
+export type BreadcrumbUrl = {
+  name: string;
+  url: string;
+};
+
+function buildBreadcrumbsFromTheBottomUp(b: Breadcrumb, separator: string = '/'): string {
   if ('root' in b) {
     return 'root';
   } else {
-    return `${getParents(tree[b.parent])}/${b.id}`;
+    return `${buildBreadcrumbsFromTheBottomUp(tree[b.parent])}${separator}${b.id}`;
   }
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+const resolvers: BreadcrumbNameResolver[] = [];
 export class BreadcrumbNameResolverHolder {
 
-  constructor() {
-    console.log(BreadcrumbNameResolverHolder.name);
-  }
-  resolvers: BreadcrumbNameResolver[] = [];
-  addResolver(r: BreadcrumbNameResolver) {
-    this.resolvers.push(r);
+  static add(r: BreadcrumbNameResolver) {
+    resolvers.push(r);
   }
 
-  get() {
-    return [...this.resolvers];
+  static get() {
+    return [...resolvers];
   }
 }
 
 export interface BreadcrumbNameResolver {
   id: Breadcrumb['id'];
-  name: string | Observable<string>;
+  name: string | ((id: string, url: string) => Observable<string>);
 }
 
 export type Breadcrumb = {
@@ -90,5 +92,3 @@ export type Breadcrumb = {
   name?: string;
   parent: string;
 };
-
-export const Mapping = new Map<Breadcrumb['id'], Function>();
