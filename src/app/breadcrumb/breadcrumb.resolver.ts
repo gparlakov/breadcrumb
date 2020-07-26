@@ -7,13 +7,15 @@ import { BreadcrumbService } from './breadcrumb.service';
   providedIn: 'root'
 })
 export class BreadcrumbResolver implements Resolve<boolean> {
-  constructor(private bs: BreadcrumbService) { }
+  constructor(private bs: BreadcrumbService) {
+    console.log(BreadcrumbService.name);
+   }
 
   resolve(
     route: ActivatedRouteSnapshot, state: RouterStateSnapshot
   ): boolean | Observable<boolean> | Promise<boolean> {
     if (route && route.data && route.data.breadcrumb) {
-      this.bs.onRoute(route.data, state.url);
+      this.bs.onRoute(route.data.breadcrumb, state.url);
     }
 
     return true;

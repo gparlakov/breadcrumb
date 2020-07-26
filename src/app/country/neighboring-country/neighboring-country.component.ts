@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-neighboring-country',
@@ -6,8 +7,11 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./neighboring-country.component.css']
 })
 export class NeighboringCountryComponent implements OnInit {
+  country: string;
 
-  constructor() { }
+  constructor(r: ActivatedRoute) {
+    r.paramMap.subscribe(o => this.country = o.get('id'));
+  }
 
   ngOnInit(): void {
   }

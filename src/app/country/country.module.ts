@@ -6,8 +6,6 @@ import { CountryComponent } from './country.component';
 import { NeighboringCountryComponent } from './neighboring-country/neighboring-country.component';
 import { CityComponent } from './city/city.component';
 import { PlaceOfInterestComponent } from './place-of-interest/place-of-interest.component';
-import { RouterModule } from '@angular/router';
-
 
 @NgModule({
   declarations: [
@@ -18,7 +16,7 @@ import { RouterModule } from '@angular/router';
   ],
   imports: [
     CommonModule,
-    RouterModule
+    CountryRoutingModule
   ]
 })
 export class CountryModule { }

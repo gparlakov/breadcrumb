@@ -1,9 +1,14 @@
-<p>country works!</p>
+<p>{{country}}</p>
 
-<nav>
+<nav *ngIf="country === 'Bulgaria'">
   <a [routerLink]="['./city/sofia']">Sofia</a>
-  <a [routerLink]="['./city/sofia']">Blagoevgrad</a>
-  <a [routerLink]="['./city/sofia']">Rilci</a>
+  <a [routerLink]="['./city/blagoevgrad']">Blagoevgrad</a>
+  <a [routerLink]="['./city/rilci']">Rilci</a>
+</nav>
+<nav *ngIf="country === 'US'">
+  <a [routerLink]="['./city/ny']">N.Y.</a>
+  <a [routerLink]="['./city/la']">L.A.</a>
+  <a [routerLink]="['./city/boston']">Boston</a>
 </nav>
 
 <router-outlet></router-outlet>

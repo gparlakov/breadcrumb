@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-city',
@@ -7,8 +8,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class CityComponent implements OnInit {
 
-  constructor() { }
+  city: string;
 
+  constructor(r: ActivatedRoute) {
+    r.paramMap.subscribe(o => this.city = o.get('id'));
+  }
   ngOnInit(): void {
   }
 
