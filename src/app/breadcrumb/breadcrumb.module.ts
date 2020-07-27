@@ -1,7 +1,7 @@
 import { NgModule, ModuleWithProviders, InjectionToken } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BreadcrumbComponent } from './breadcrumb.component';
-import { BreadcrumbNameResolverHolder, BreadcrumbNameResolver } from './breadcrumb.service';
+import { BreadcrumbNameResolver } from './breadcrumb.service';
 
 export const BreadcrumbNameResolverToken = new InjectionToken<BreadcrumbNameResolver[]>('Injects the breadcrumb name resolvers');
 @NgModule({
