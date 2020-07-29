@@ -65,7 +65,7 @@ export class CountryRoutingModule {
 
     BreadcrumbNameResolvers.add({
       id: countryBc,
-      name: (url: string, _: BreadcrumbLeaf) => {
+      resolve: (url: string, _: BreadcrumbLeaf) => {
 
         return matchRouteWithParam<Observable<Breadcrumb>>(url, 'country/')
           .onMatch((url, id) => http
@@ -82,8 +82,25 @@ export class CountryRoutingModule {
     BreadcrumbNameResolvers.add({
       id: cityBc,
       // 'city' 'city/sf'
-      name: (url: string, _: BreadcrumbLeaf) => {
+      resolve: (url: string, _: BreadcrumbLeaf) => {
 
+
+        // try and use the free tier
+        /**
+         * fetch("http://geodb-free-service.wirefreethought.com/v1/geo/cities?namePrefix=Sofia&limit=5&offset=0&hateoasMode=false", {
+            "headers": {
+              "accept": "application/json",
+              "accept-language": "en-GB,en-US;q=0.9,en;q=0.8",
+              "content-type": "application/json"
+            },
+            "referrer": "http://wft-geodb-demo.s3-website-us-west-2.amazonaws.com/index.html",
+            "referrerPolicy": "no-referrer-when-downgrade",
+            "body": null,
+            "method": "GET",
+            "mode": "cors",
+            "credentials": "omit"
+          });
+         */
         return matchRouteWithParam<Observable<Breadcrumb>>(url, 'city/')
           .onMatch((prefix, param) => this.geoDbService.findPlace({ placeId: param })
             .pipe(map(r => ({name: r.data.city, url: prefix + param})))

@@ -10,8 +10,8 @@ export class BreadcrumbService {
   private state = new BehaviorSubject<string>('');
   public state$ = this.state.asObservable();
 
-  private names = new BehaviorSubject<Breadcrumb[]>([{} as Breadcrumb]);
-  public names$ = this.names.asObservable();
+  private crumbs = new BehaviorSubject<Breadcrumb[]>([{} as Breadcrumb]);
+  public crumbs$ = this.crumbs.asObservable().pipe();
 
   constructor() {
   }
@@ -19,7 +19,7 @@ export class BreadcrumbService {
     const bc = tree[id];
 
     if (bc == null) {
-      throw new Error('Missing breadcrumb lef in the breadcrumb tree for ' + id);
+      throw new Error('Missing breadcrumb leaf in the breadcrumb tree for ' + id);
     }
 
     const breadCrumbs = 'root' in bc && bc.root === true
@@ -38,11 +38,11 @@ export class BreadcrumbService {
           if (res == null) {
             return defaultBreadcrumbName(url, bc);
           } else {
-            return res.name(url, bc);
+            return res.resolve(url, bc);
           }
         }))
       .pipe(defaultIfEmpty([] as Breadcrumb[]), take(1))
-      .subscribe(n => this.names.next(n));
+      .subscribe(n => this.crumbs.next(n));
 
   }
 }
@@ -80,9 +80,9 @@ export class BreadcrumbNameResolvers {
 
 export interface BreadcrumbNameResolver {
   id: BreadcrumbLeaf['id'];
-  name: (url: string, bc: BreadcrumbLeaf) => Observable<Breadcrumb>;
+  resolve: (url: string, bc: BreadcrumbLeaf) => Observable<Breadcrumb>;
 }
-export const defaultBreadcrumbName: BreadcrumbNameResolver['name'] = (url, t) => {
+export const defaultBreadcrumbName: BreadcrumbNameResolver['resolve'] = (url, t) => {
   return of({ name: t.name, url });
 };
 

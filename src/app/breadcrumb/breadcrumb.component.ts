@@ -14,6 +14,6 @@ export class BreadcrumbComponent {
 
   constructor(s: BreadcrumbService) {
     this.state$ = s.state$;
-    this.names$ = s.names$;
+    this.names$ = s.crumbs$;
   }
 }
