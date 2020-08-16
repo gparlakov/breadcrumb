@@ -36,19 +36,28 @@ export class BreadcrumbService {
         .map(i => {
           const res = nameResolvers.find(r => r.id === i);
           if (res == null) {
-            return defaultBreadcrumbName(url, bc);
-          } else {
+            return defaultBreadcrumbName(`/${i}`, tree[i]);
+          }
+          else {
             return res.resolve(url, bc);
           }
         }))
       .pipe(defaultIfEmpty([] as Breadcrumb[]), take(1))
       .subscribe(n => this.crumbs.next(n));
+  }
 
+  onCrumbInteract(b: Breadcrumb) {
+    this.crumbs$.pipe(take(1)).subscribe(cs => {
+      const index = cs.findIndex(c => c.name === b.name);
+      this.crumbs.next(cs.slice(0, index + 1));
+    });
   }
 }
 
+
+
 const tree: { [k: string]: BreadcrumbLeaf | null } = {
-  root: { root: true, name: 'root name', id: 'root' },
+  root: { root: true, name: 'Root', id: 'root' },
   country: { parent: 'root', id: 'country' },
   city: { parent: 'country', id: 'city' }
 };
@@ -59,7 +68,7 @@ export type Breadcrumb = {
 };
 
 function buildBreadcrumbsFromTheBottomUp(b: BreadcrumbLeaf, separator: string = '/'): string {
-  if ('root' in b) {
+  if ('root' in b || !b.parent) {
     return 'root';
   } else {
     return `${buildBreadcrumbsFromTheBottomUp(tree[b.parent])}${separator}${b.id}`;
@@ -97,11 +106,12 @@ export type BreadcrumbLeaf = {
 };
 
 export function matchRouteWithParam<T>(url: string, route: string) {
-  const matcher = new RegExp(`^.*(${route})([!/]*)$|^.*(${route})(.*/)`);
+  const normalizedRoute = route[route.length - 1] === '/' ? route : route + '/';
+  const matcher = new RegExp(`^(.*${normalizedRoute})([^/]*)$|^(.*${normalizedRoute})([^/]*)`);
   const matches = url.match(matcher);
-  const hasMatches = Array.isArray(matches) && matches.length === 3;
-  // matches consists of 0: the whole string 1: the first matched group i.e. (${route}) 2: the second matched group (.*/) | ([!/]*)$
-  // i.e. 'root/country/BGR/city/SFA'.match(country/) => [1] === 'country/' [2]==='BGR'
+  const hasMatches = Array.isArray(matches) && matches[2] != null || matches[4] != null;
+  const prefix = matches[2] ? matches[1] : matches[4] ? matches[3] : route;
+  const match = matches[2] || matches[4];
 
   let onMatch: (routePrefix: string, routeParam: string) => T;
   let noMatch: () => T;
@@ -120,7 +130,7 @@ export function matchRouteWithParam<T>(url: string, route: string) {
   };
   const c = {
     go() {
-      return hasMatches ? onMatch(matches[1], matches[2]) : noMatch();
+      return hasMatches ? onMatch(prefix, match) : noMatch();
     }
   };
 

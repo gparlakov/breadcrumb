@@ -1,3 +1,5 @@
-<p>>> {{state$ | async}} --</p>
+<p>>> {{ state$ | async }} --</p>
 
-<span *ngFor="let n of names$ | async"> {{n}} ></span>
+<span *ngFor="let n of names$ | async;index as i">
+  <span *ngIf="i > 0">></span> <a (click)="onCrumbLink(n)" routerLink="{{n.url}}">{{ n.name }}</a>
+</span>

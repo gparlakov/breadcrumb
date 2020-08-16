@@ -2,6 +2,7 @@ import { NgModule, ModuleWithProviders, InjectionToken } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BreadcrumbComponent } from './breadcrumb.component';
 import { BreadcrumbNameResolver } from './breadcrumb.service';
+import { RouterModule } from '@angular/router';
 
 export const BreadcrumbNameResolverToken = new InjectionToken<BreadcrumbNameResolver[]>('Injects the breadcrumb name resolvers');
 @NgModule({
@@ -9,6 +10,7 @@ export const BreadcrumbNameResolverToken = new InjectionToken<BreadcrumbNameReso
   exports: [BreadcrumbComponent],
   imports: [
     CommonModule
+    , RouterModule
   ]
 })
 export class BreadcrumbModule {

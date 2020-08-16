@@ -1,5 +1,5 @@
 import { Component, OnInit, OnChanges } from '@angular/core';
-import { BreadcrumbService } from './breadcrumb.service';
+import { BreadcrumbService, Breadcrumb } from './breadcrumb.service';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -10,10 +10,14 @@ import { Observable } from 'rxjs';
 export class BreadcrumbComponent {
 
   state$: Observable<string>;
-  names$: Observable<string[]>;
+  names$: Observable<Breadcrumb[]>;
 
-  constructor(s: BreadcrumbService) {
+  constructor(private s: BreadcrumbService) {
     this.state$ = s.state$;
     this.names$ = s.crumbs$;
+  }
+
+  onCrumbLink(b: Breadcrumb) {
+    this.s.onCrumbInteract(b);
   }
 }
